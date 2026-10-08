@@ -1,3 +1,4 @@
+import { ArinkoName } from "@clarity-types/arinko"; // ARINKO
 import { Constant as CoreConstant, Time } from "@clarity-types/core";
 import { BooleanFlag, ConsentData, ConsentSource, ConsentState, Constant, Dimension, Metadata, MetadataCallback, MetadataCallbackOptions, Metric, Session, Setting, User } from "@clarity-types/data";
 import * as clarity from "@src/clarity";
@@ -41,7 +42,7 @@ export function start(): void {
   dimension.log(Dimension.UserAgent, ua);
   dimension.log(Dimension.PageTitle, title);
   dimension.log(Dimension.Url, scrub.url(location.href, !!electron));
-  dimension.log(Dimension.Referrer, document.referrer);
+  dimension.log(Dimension.Referrer, scrub.url(document.referrer)); // ARINKO: was document.referrer
   dimension.log(Dimension.TabId, tab());
   dimension.log(Dimension.PageLanguage, document.documentElement.lang);
   dimension.log(Dimension.DocumentDirection, document.dir);
@@ -222,20 +223,20 @@ function normalizeConsent(value: unknown, fallback: string = Constant.Denied): s
 
 export function clear(all: boolean = false): void {
   // Clear any stored information in the cookie that tracks session information so we can restart fresh the next time
-  setCookie(Constant.SessionKey, Constant.Empty, 0);
+  setCookie(ArinkoName.SessionKey, Constant.Empty, 0); // ARINKO
 
   // Clear user cookie as well if all flag is set
   if (all) {
-    setCookie(Constant.CookieKey, Constant.Empty, 0);
+    setCookie(ArinkoName.CookieKey, Constant.Empty, 0); // ARINKO
   }
 }
 
 function tab(): string {
   let id = shortid();
   if (config.track && supported(window, Constant.SessionStorage)) {
-    let value = sessionStorage.getItem(Constant.TabKey);
+    let value = sessionStorage.getItem(ArinkoName.TabKey); // ARINKO
     id = value ? value : id;
-    sessionStorage.setItem(Constant.TabKey, id);
+    sessionStorage.setItem(ArinkoName.TabKey, id); // ARINKO
   }
   return id;
 }
@@ -250,7 +251,7 @@ export function save(): void {
   let ts = Math.round(Date.now());
   let upload = config.upload && typeof config.upload === Constant.String ? (config.upload as string).replace(Constant.HTTPS, Constant.Empty) : Constant.Empty;
   let upgrade = config.lean ? BooleanFlag.False : BooleanFlag.True;
-  setCookie(Constant.SessionKey, [data.sessionId, ts, data.pageNum, upgrade, upload].join(COOKIE_SEP), Setting.SessionExpire);
+  setCookie(ArinkoName.SessionKey, [data.sessionId, ts, data.pageNum, upgrade, upload].join(COOKIE_SEP), Setting.SessionExpire); // ARINKO
 }
 
 function processCallback(upgrade: BooleanFlag, consentUpdate: boolean = false): void {
@@ -285,7 +286,7 @@ function track(u: User, consent: BooleanFlag = null): void {
   // To avoid cookie churn, write user id cookie only once every day
   if (u.expiry === null || Math.abs(end - u.expiry) >= Setting.CookieInterval || u.consent !== consent || u.dob !== dob) {
     let cookieParts = [data.userId, Setting.CookieVersion, end.toString(36), consent, dob];
-    setCookie(Constant.CookieKey, cookieParts.join(COOKIE_SEP), Setting.Expire);
+    setCookie(ArinkoName.CookieKey, cookieParts.join(COOKIE_SEP), Setting.Expire); // ARINKO
   }
 }
 
@@ -299,7 +300,7 @@ export function shortid(): string {
 
 function session(): Session {
   let output: Session = { session: shortid(), ts: Math.round(Date.now()), count: 1, upgrade: null, upload: Constant.Empty };
-  let value = getCookie(Constant.SessionKey, !config.includeSubdomains);
+  let value = getCookie(ArinkoName.SessionKey, !config.includeSubdomains); // ARINKO
   if (value) {
     // Maintaining support for pipe separator for backward compatibility, this can be removed in future releases
     let parts = value.includes(Constant.Caret) ? value.split(Constant.Caret) : value.split(Constant.Pipe);
@@ -322,7 +323,7 @@ function num(string: string, base: number = 10): number {
 
 function user(): User {
   let output: User = { id: shortid(), version: 0, expiry: null, consent: BooleanFlag.False, dob: 0 };
-  let cookie = getCookie(Constant.CookieKey, !config.includeSubdomains);
+  let cookie = getCookie(ArinkoName.CookieKey, !config.includeSubdomains); // ARINKO
   if (cookie && cookie.length > 0) {
     // Splitting and looking up first part for forward compatibility, in case we wish to store additional information in a cookie
     // Maintaining support for pipe separator for backward compatibility, this can be removed in future releases

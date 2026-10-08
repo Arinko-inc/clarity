@@ -1,8 +1,8 @@
-import { Constant } from "@clarity-types/data";
+import { ArinkoName } from "@clarity-types/arinko"; // ARINKO: was import { Constant } from "@clarity-types/data";
 import * as clarity from "@src/clarity";
 
 const w = window; 
-const c = Constant.Clarity;
+const c = ArinkoName.Global; // ARINKO: was Constant.Clarity
 
 export function setup() {
     // Start queuing up calls while Clarity is inactive and we are in a browser enviornment    

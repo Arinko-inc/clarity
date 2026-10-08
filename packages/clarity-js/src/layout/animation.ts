@@ -1,3 +1,4 @@
+import { ArinkoName } from "@clarity-types/arinko"; // ARINKO
 import { Event } from "@clarity-types/data";
 import { AnimationOperation, AnimationState } from "@clarity-types/layout";
 import { time } from "@src/core/time";
@@ -9,8 +10,8 @@ import * as core from "@src/core";
 export let state: AnimationState[] = [];
 let elementAnimate: (keyframes: Keyframe[] | PropertyIndexedKeyframes, options?: number | KeyframeAnimationOptions) => Animation = null;
 let overridden = false;
-const animationId = '__clrAId';
-const operationCount = '__clrOCnt';
+const animationId = ArinkoName.AnimationId; // ARINKO: was '__clrAId'
+const operationCount = ArinkoName.OperationCount; // ARINKO: was '__clrOCnt'
 const maxOperations = 20;
 
 export function start(): void {

@@ -2,6 +2,7 @@ import { Privacy } from "@clarity-types/core";
 import * as Data from "@clarity-types/data";
 import * as Layout from "@clarity-types/layout";
 import config from "@src/core/config";
+import * as arinkoUrl from "@src/arinko/url"; // ARINKO
 
 const catchallRegex = /\S/gi;
 const maxUrlLength = 2048;
@@ -94,6 +95,7 @@ export function text(value: string, hint: string, privacy: Privacy, mangle: bool
 }
 
 export function url(input: string, electron: boolean = false, truncate: boolean = false): string {
+    input = arinkoUrl.clean(input); // ARINKO
     let result = input;
     // Replace the URL for Electron apps so we don't send back file:/// URL
     if (electron) {

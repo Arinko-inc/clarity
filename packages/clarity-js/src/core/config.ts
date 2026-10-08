@@ -4,6 +4,7 @@ import { Setting } from "@clarity-types/data";
 let config: Config = {
     projectId: null,
     delay: 1 * Time.Second,
+    maxDelay: null, // ARINKO: src/arinko/delay.ts
     lean: false,
     lite: false,
     track: true,

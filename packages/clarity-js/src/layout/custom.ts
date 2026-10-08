@@ -1,3 +1,4 @@
+import { ArinkoName } from "@clarity-types/arinko"; // ARINKO
 import { Event } from "@clarity-types/data";
 import { active } from "@src/core";
 import { schedule } from "@src/core/task";
@@ -23,14 +24,14 @@ export function check(tag: string) {
 export function start() {
     // Wrap in try-catch to handle Safari iOS where window properties or customElements.define may be readonly
     try {
-        window.__clr = window.__clr || {};
-        if (window.customElements?.define && !window.__clr.define) {
-            window.__clr.define = window.customElements.define;
+        window[ArinkoName.Hooks] = window[ArinkoName.Hooks] || {}; // ARINKO
+        if (window.customElements?.define && !window[ArinkoName.Hooks].define) { // ARINKO
+            window[ArinkoName.Hooks].define = window.customElements.define; // ARINKO
             window.customElements.define = function () {
                 if (active()) {
                     register(arguments[0]);
                 }
-                return window.__clr.define.apply(this, arguments);
+                return window[ArinkoName.Hooks].define.apply(this, arguments); // ARINKO
             };
         }
     } catch (e) {

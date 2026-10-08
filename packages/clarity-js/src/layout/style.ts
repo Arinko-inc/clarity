@@ -1,3 +1,4 @@
+import { ArinkoName } from "@clarity-types/arinko"; // ARINKO
 import { Event } from "@clarity-types/data";
 import { StyleSheetOperation, StyleSheetState } from "@clarity-types/layout";
 import { time } from "@src/core/time";
@@ -10,7 +11,7 @@ import { getCssRules } from "./node";
 
 export let sheetUpdateState: StyleSheetState[] = [];
 export let sheetAdoptionState: StyleSheetState[] = [];
-const styleSheetId = '__clrSId';
+const styleSheetId = ArinkoName.StyleSheetId; // ARINKO: was '__clrSId'
 let styleSheetMap = {};
 let styleTimeMap: {[key: string]: number} = {};
 let documentNodes = [];
@@ -21,7 +22,7 @@ function proxyStyleRules(win: any) {
         return;
     }
     
-    win.__clr = win.__clr || {};
+    win[ArinkoName.Hooks] = win[ArinkoName.Hooks] || {}; // ARINKO
 
     if (win['CSSStyleSheet'] && win.CSSStyleSheet.prototype) {
         proxyStyleMethod(win, "replace", StyleSheetOperation.Replace);
@@ -33,15 +34,15 @@ function proxyStyleRules(win: any) {
 // and attached the sheet to a document. This way the timestamp of the style sheet creation will align
 // to when it is used in the document rather than potentially being misaligned during the traverse process.
 function proxyStyleMethod(win: any, method: string, operation: StyleSheetOperation): void {
-    if (win.__clr[method] === undefined) {
-        win.__clr[method] = win.CSSStyleSheet.prototype[method];
+    if (win[ArinkoName.Hooks][method] === undefined) { // ARINKO
+        win[ArinkoName.Hooks][method] = win.CSSStyleSheet.prototype[method]; // ARINKO
         win.CSSStyleSheet.prototype[method] = function() {
             if (core.active()) {
                 if (createdSheetIds.includes(this[styleSheetId])) {
                     trackStyleChange(time(), this[styleSheetId], operation, arguments[0]);
                 }
             }
-            return win.__clr[method].apply(this, arguments);
+            return win[ArinkoName.Hooks][method].apply(this, arguments); // ARINKO
         };
     }
 }

@@ -1,3 +1,4 @@
+import { ArinkoName } from "@clarity-types/arinko"; // ARINKO
 import { Priority, Task, Timer } from "@clarity-types/core";
 import { Code, Event, Metric, Severity } from "@clarity-types/data";
 import { Constant, MutationHistory, MutationRecordWithTime, MutationQueue, Setting, Source } from "@clarity-types/layout";
@@ -346,7 +347,7 @@ function proxyStyleRules(win: any): void {
     return;
   }
 
-  win.__clr = win.__clr || {};
+  win[ArinkoName.Hooks] = win[ArinkoName.Hooks] || {}; // ARINKO
 
   // Some popular open source libraries, like styled-components, optimize performance
   // by injecting CSS using insertRule API vs. appending text node. A side effect of
@@ -360,30 +361,30 @@ function proxyStyleRules(win: any): void {
   // Add a hook to attachShadow API calls
   // In case we are unable to add a hook and browser throws an exception,
   // reset attachShadow variable and resume processing like before
-  if ("Element" in win && win.Element && win.Element.prototype && win.__clr.AttachShadow === undefined) {
-    win.__clr.AttachShadow = win.Element.prototype.attachShadow;
+  if ("Element" in win && win.Element && win.Element.prototype && win[ArinkoName.Hooks].AttachShadow === undefined) { // ARINKO
+    win[ArinkoName.Hooks].AttachShadow = win.Element.prototype.attachShadow; // ARINKO
     try {
       win.Element.prototype.attachShadow = function (): ShadowRoot {
         if (core.active()) {
-          return schedule(win.__clr.AttachShadow.apply(this, arguments)) as ShadowRoot;
+          return schedule(win[ArinkoName.Hooks].AttachShadow.apply(this, arguments)) as ShadowRoot; // ARINKO
         } else {
-          return win.__clr.AttachShadow.apply(this, arguments);
+          return win[ArinkoName.Hooks].AttachShadow.apply(this, arguments); // ARINKO
         }
       };
     } catch {
-      win.__clr.AttachShadow = null;
+      win[ArinkoName.Hooks].AttachShadow = null; // ARINKO
     }
   }
 }
 
 function proxyRule(win: any, cls: string, key: string, method: string, getNode: () => Node): void {
-  if (cls in win && win[cls] && win[cls].prototype && win.__clr[key] === undefined) {
-    win.__clr[key] = win[cls].prototype[method];
+  if (cls in win && win[cls] && win[cls].prototype && win[ArinkoName.Hooks][key] === undefined) { // ARINKO
+    win[ArinkoName.Hooks][key] = win[cls].prototype[method]; // ARINKO
     win[cls].prototype[method] = function (): any {
       if (core.active()) {
         schedule(getNode.call(this));
       }
-      return win.__clr[key].apply(this, arguments);
+      return win[ArinkoName.Hooks][key].apply(this, arguments); // ARINKO
     };
   }
 }

@@ -1,3 +1,4 @@
+import * as arinkoDelay from "@src/arinko/delay"; // ARINKO
 import { UploadCallback } from "@clarity-types/core";
 import { BooleanFlag, Check, Code, Constant, EncodedPayload, Event, Metric, Setting, Severity, Token, Transit, UploadData, XMLReadyState } from "@clarity-types/data";
 import * as clarity from "@src/clarity";
@@ -88,7 +89,7 @@ export function queue(tokens: Token[], transmit: boolean = true): void {
     // Following two checks are precautionary and act as a fail safe mechanism to get out of unexpected situations.
     // Check 1: If for any reason the upload hasn't happened after waiting for 2x the config.delay time,
     // reset the timer. This allows Clarity to attempt an upload again.
-    let gap = delay();
+    let gap = arinkoDelay.cap(delay()); // ARINKO: was delay()
     if (now - queuedTime > (gap * 2)) {
         clearTimeout(timeout);
         timeout = null;

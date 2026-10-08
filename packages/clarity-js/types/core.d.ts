@@ -119,6 +119,7 @@ export interface Report {
 export interface Config {
     projectId?: string;
     delay?: number;
+    maxDelay?: number; // ARINKO: src/arinko/delay.ts
     lean?: boolean;
     lite?: boolean;
     track?: boolean;
