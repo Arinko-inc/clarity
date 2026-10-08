@@ -2,6 +2,7 @@ import { Privacy, Task, Timer } from "@clarity-types/core";
 import { Event, Setting, Token } from "@clarity-types/data";
 import { Constant, NodeInfo, NodeValue } from "@clarity-types/layout";
 import config from "@src/core/config";
+import * as arinkoUrl from "@src/arinko/url"; // ARINKO
 import * as scrub from "@src/core/scrub";
 import * as task from "@src/core/task";
 import { time } from "@src/core/time";
@@ -137,6 +138,7 @@ function size(value: NodeValue): number[] {
 }
 
 function attribute(key: string, value: string, privacy: Privacy, tag: string): string {
+    value = arinkoUrl.attribute(key, value, tag); // ARINKO
     if (key === Constant.Href && tag === Constant.LinkTag) {
         return key + "=" + value;
     }
