@@ -90,6 +90,7 @@ tools/arinko-update.sh --push    # 上に加えて origin の arinko/patches を
 - **衝突したら rebase を取り消して元に戻し、衝突したファイル名を表示して終了コード 2 で止まる**(macOS では通知センターにも出す)。手で直すときは表示されたコマンドで rebase をやり直す
 - ブランチは積み直しで書き換わるので、push は `--force-with-lease`。`arinko/patches` へ PR をマージするときもマージコミットを作らず rebase で積む
 - 定期実行(cron・LaunchAgent・GitHub Actions)はまだ入れていない
+- 2026-10-08 に一時の worktree で v0.8.71 → v0.8.72 の積み直しを試し、衝突なしでビルドと名前の検査まで通った(約13秒)。衝突の経路は、`queue.ts` の差し込み口と同じ行を書き換えた偽のタグで試し、rebase を取り消して元のコミットに戻ること・終了コード 2 を確かめた
 
 ## ページへの組み込み
 
@@ -105,5 +106,6 @@ antreplay("start", { projectId: "<サイト名>", upload: "/_r/c.php", track: tr
 ```
 
 - `start` は `antreplay("start", {...})` の1回で足りる(Microsoft のタグはローダーが `start` を呼ぶが、`ar.js` は自分では呼ばない)
+- **Microsoft 側のマスク設定「バランス」と同じにするなら `unmask: ["body"]` も渡す。**2026-10-08 に antlaunch.jp のローダー(`www.clarity.ms/tag/yshfdg84k7`)が渡していた設定は `"content":true,"unmask":["body"]` だった。`content: true` だけだと、本文の中の数字や `@` を含む語が伏せられる(`影の中の文字 1` が `影の中の文字 ▫` になった)。`unmask: ["body"]` を足しても、入力欄(`input` など)と `data-clarity-mask` を付けた要素は伏せたまま
 - 独自イベントとカスタムタグは `antreplay("event", "<名前>")` と `antreplay("set", "<キー>", "<値>")`。Microsoft 側にも送るなら `clarity(...)` も呼ぶ
 - `upload` に `http://` で始まる絶対 URL を渡さない。`_arsk` に書いた送信先は、次のページで `https://` を前に付けて読み戻されるので、`http://` だと壊れる(上流の仕様。`/` で始まる相対パスか `https://` の URL にする)
