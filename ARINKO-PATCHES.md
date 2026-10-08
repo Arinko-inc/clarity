@@ -76,7 +76,7 @@
 
 ### 7. 版の文字列(`src/arinko/version.ts`)
 
-- `ar.js` の版は `<上流の版>-arinko.<ビルドした日>.<このフォークのコミットの短い SHA>`(例 `0.8.71-arinko.20261008.05fe3a5`)。`tools/arinko-update.sh` がビルドの後に埋め込み、`dist/BUILD-INFO` の `build=` と `ar.js` 先頭のコメントにも書く
+- `ar.js` の版は `<上流の版>-arinko.<ビルドした日>.<このフォークのコミットの短い SHA>`(例 `0.8.71-arinko.20261008.4d8cd84`)。`tools/arinko-update.sh` がビルドの後に埋め込み、`dist/BUILD-INFO` の `build=` と `ar.js` 先頭のコメントにも書く
 - ページからは **`window.__arrVersion`** で読む。`window.antreplay("version")` は使えない(上流の公開関数は `clarity.ts` が書き出した関数を名前で呼ぶ形で、`version` は関数ではなく文字列のため)
 - 各サイトは `ar.js?v=<版>` の形で読む(arinko.jp の `.htaccess` は js に1週間の Expires を付ける)。版を上げたら `v` も上げる
 
@@ -180,4 +180,4 @@ antreplay("start", {
 - `start` は `antreplay("start", {...})` の1回で足りる(Microsoft のタグはローダーが `start` を呼ぶが、`ar.js` は自分では呼ばない)
 - 独自イベントとカスタムタグは `antreplay("event", "<名前>")` と `antreplay("set", "<キー>", "<値>")`。Microsoft 側にも送るなら `clarity(...)` も呼ぶ
 - 既定と同じ値も雛形に書いておく(既定を変えたときに、各サイトの動きが黙って変わらないようにするため)
-- `maxDelay: 2000` の根拠: 2026-10-08 のテストページ(約20秒の操作)で、上流どおりだと留まっている間の間隔が最長 5.6 秒、2000 だと 2.0〜2.7 秒に縮んだ。送信の回数は 7 回 → 10 回、バイト数は約 7% 増(`~/ant-replay/poc/01-fork/NOTES.md`)。長く滞在したページの末尾の欠け方は PoC 10 で測る
+- `maxDelay: 2000` の根拠: 2026-10-08 のテストページ(1ページ目に約25秒)で、操作が続いている間の送信の間隔が、上流どおりの最長 5.6 秒から 2.0〜2.8 秒に縮んだ。1ページ目の送信の回数は 8 回 → 11 回、バイト数は約 7% 増(`~/ant-replay/poc/01-fork/NOTES.md` の結果 7)。長く滞在したページの末尾の欠け方は PoC 10 で測る
