@@ -106,16 +106,22 @@ done
 UPSTREAM_TAG="$(git describe --tags --abbrev=0 --match 'v[0-9]*' --exclude '*-*' HEAD)"
 SHA="$(git rev-parse --short=12 HEAD)"
 VERSION="$(node -p "require('./packages/clarity-js/package.json').version")"
+# ar.js の版: <上流の版>-arinko.<ビルドした日>.<フォークのコミットの短い SHA>。window.__arrVersion で読め、各サイトは ar.js?v=<版> で読む
+BUILD="${VERSION}-arinko.$(date '+%Y%m%d').$(git rev-parse --short=7 HEAD)"
+PLACEHOLDER='@@ARINKO_BUILD@@'
+n="$({ grep -o -- "$PLACEHOLDER" "$MIN" || true; } | wc -l | tr -d ' ')"
+[ "$n" = "1" ] || fail 4 "版の置き場所($PLACEHOLDER)が ${n} 個ある(1個のはず。src/arinko/version.ts を見る)"
 mkdir -p dist
 {
-  printf '/*! AntReplay ar.js = clarity-js %s (Copyright (c) Microsoft Corporation, MIT License, https://github.com/microsoft/clarity) + Arinko-inc/clarity %s (%s) */\n' "$VERSION" "$SHA" "$UPSTREAM_TAG"
-  cat "$MIN"
+  printf '/*! AntReplay ar.js %s = clarity-js %s (Copyright (c) Microsoft Corporation, MIT License, https://github.com/microsoft/clarity) + Arinko-inc/clarity %s (%s) */\n' "$BUILD" "$VERSION" "$SHA" "$UPSTREAM_TAG"
+  PH="$PLACEHOLDER" B="$BUILD" perl -pe 's/\Q$ENV{PH}\E/$ENV{B}/g' "$MIN"
 } > dist/ar.js
+grep -q -- "\"$BUILD\"" dist/ar.js || fail 4 "dist/ar.js に版の文字列 $BUILD が入っていない"
 RAW="$(wc -c < dist/ar.js | tr -d ' ')"
 GZ="$(gzip -9c dist/ar.js | wc -c | tr -d ' ')"
-printf 'upstream_tag=%s\ncommit=%s\nversion=%s\nbuilt_at=%s\nbytes=%s\ngzip_bytes=%s\n' \
-  "$UPSTREAM_TAG" "$(git rev-parse HEAD)" "$VERSION" "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$RAW" "$GZ" > dist/BUILD-INFO
-log "dist/ar.js を作った: $RAW バイト(gzip -9 で $GZ バイト)、上流 ${UPSTREAM_TAG}、コミット $SHA"
+printf 'build=%s\nupstream_tag=%s\ncommit=%s\nversion=%s\nbuilt_at=%s\nbytes=%s\ngzip_bytes=%s\n' \
+  "$BUILD" "$UPSTREAM_TAG" "$(git rev-parse HEAD)" "$VERSION" "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$RAW" "$GZ" > dist/BUILD-INFO
+log "dist/ar.js を作った: 版 ${BUILD}、$RAW バイト(gzip -9 で $GZ バイト)、上流 ${UPSTREAM_TAG}、コミット $SHA"
 
 if [ "$PUSH" -eq 1 ]; then
   log "origin の $BRANCH を更新(--force-with-lease)"

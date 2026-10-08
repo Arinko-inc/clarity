@@ -1,3 +1,4 @@
+import * as arinkoPage from "@src/arinko/page"; // ARINKO
 import { BooleanFlag, Token, Upload, Envelope, ApplicationPlatform } from "@clarity-types/data";
 import { time } from "@src/core/time";
 import version from "@src/core/version";
@@ -48,6 +49,6 @@ export function envelope(last: boolean): Token[] {
     data.upload,
     data.end,
     data.applicationPlatform,
-    data.url
+    data.url, arinkoPage.key, arinkoPage.time // ARINKO: e[12] page key, e[13] page start (epoch ms)
   ];
 }

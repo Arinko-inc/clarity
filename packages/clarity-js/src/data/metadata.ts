@@ -1,4 +1,6 @@
 import { ArinkoName } from "@clarity-types/arinko"; // ARINKO
+import * as arinkoCookie from "@src/arinko/cookie"; // ARINKO
+import * as arinkoPage from "@src/arinko/page"; // ARINKO
 import { Constant as CoreConstant, Time } from "@clarity-types/core";
 import { BooleanFlag, ConsentData, ConsentSource, ConsentState, Constant, Dimension, Metadata, MetadataCallback, MetadataCallbackOptions, Metric, Session, Setting, User } from "@clarity-types/data";
 import * as clarity from "@src/clarity";
@@ -30,6 +32,7 @@ export function start(): void {
 
   // Populate ids for this page
   let s = session();
+  arinkoPage.start(s.ts); // ARINKO
   let u = user();
   let projectId = config.projectId || hash(location.host);
   data = { projectId, userId: u.id, sessionId: s.session, pageNum: s.count };
@@ -249,7 +252,7 @@ export function callback(consentUpdate: boolean = false): void {
 export function save(): void {
   if (!data || !config.track) return;
   let ts = Math.round(Date.now());
-  let upload = config.upload && typeof config.upload === Constant.String ? (config.upload as string).replace(Constant.HTTPS, Constant.Empty) : Constant.Empty;
+  let upload = arinkoCookie.upload(config.upload); // ARINKO: was config.upload with "https://" removed
   let upgrade = config.lean ? BooleanFlag.False : BooleanFlag.True;
   setCookie(ArinkoName.SessionKey, [data.sessionId, ts, data.pageNum, upgrade, upload].join(COOKIE_SEP), Setting.SessionExpire); // ARINKO
 }

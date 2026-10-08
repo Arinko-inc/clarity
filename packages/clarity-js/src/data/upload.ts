@@ -1,4 +1,5 @@
 import * as arinkoDelay from "@src/arinko/delay"; // ARINKO
+import * as arinkoHide from "@src/arinko/hide"; // ARINKO
 import { UploadCallback } from "@clarity-types/core";
 import { BooleanFlag, Check, Code, Constant, EncodedPayload, Event, Metric, Setting, Severity, Token, Transit, UploadData, XMLReadyState } from "@clarity-types/data";
 import * as clarity from "@src/clarity";
@@ -45,7 +46,10 @@ export function start(): void {
     analysis = [];
     transit = {};
     track = null;
+    arinkoHide.start(flushNow); // ARINKO
 }
+
+function flushNow(): void { if (active && timeout !== null) { clearTimeout(timeout); upload(); } } // ARINKO: src/arinko/hide.ts
 
 export function queue(tokens: Token[], transmit: boolean = true): void {
     if (!active) {

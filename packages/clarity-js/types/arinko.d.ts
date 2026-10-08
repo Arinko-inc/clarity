@@ -16,5 +16,6 @@ export const enum ArinkoName {
 declare global {
     interface Window {
         __arr?: { [key: string]: ((...args: any[]) => any) | undefined };
+        __arrVersion?: string; // ar.js の版(src/arinko/version.ts)
     }
 }

@@ -120,6 +120,7 @@ export interface Config {
     projectId?: string;
     delay?: number;
     maxDelay?: number; // ARINKO: src/arinko/delay.ts
+    flushOnHide?: boolean; // ARINKO: src/arinko/hide.ts
     lean?: boolean;
     lite?: boolean;
     track?: boolean;
